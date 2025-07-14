@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WhatsApp Poll Export Settings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 240px;
+      padding: 8px;
+      background-color: #f5f5f5;
+      direction: rtl;
+      margin: 0;
+    }
+    .container {
+      background-color: #fff;
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #25d366; /* #128C7E; WhatsApp green */
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 15px;
+      text-align: center;
+    }
+    .setting-group {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .setting-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    select, input[type="radio"] {
+      margin-left: 3px;
+      accent-color: darkgreen;
+    }
+    .format-option, .language-option {
+      margin-bottom: 5px;
+      font-size: 12px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    .save-btn {
+      background-color: #25d366; /* #075E54; */
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+    .save-btn:hover {
+      background-color: #0f9640;
+    }
+    .status {
+      text-align: center;
+      margin-top: 6px;
+      font-size: 11px;
+      color: #4CAF50;
+      height: 14px;
+    }
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid #eee;
+      font-size: 10px;
+      color: #666;
+      text-align: center;
+    }
+    .logo {
+      width: 30px;
+      height: 30px;
+      margin-left: 4px;
+      object-fit: contain;
+    }
+    select {
+      font-size: 12px;
+      padding: 2px;
+    }
+  </style>
+</head>
+<body>
+  בס''ד
+  <div class="container">
+    <h2 id="header-title">הגדרות ייצוא סקרי וואטסאפ</h2>
+    
+    <div class="setting-group">
+      <label id="format-label">פורמט ייצוא:</label>
+      <div class="format-option" style="display: none;">
+        <input type="radio" id="format-xlsx" name="export-format" value="xlsx">
+        <label for="format-xlsx">Excel (XLSX) - עם עיצוב</label>
+      </div>
+      <div class="format-option">
+        <input type="radio" id="format-html" name="export-format" value="html-excel">
+        <label for="format-html" id="html-excel-label">Excel (HTML) - תואם לכל גרסה</label>
+      </div>
+      <div class="format-option">
+        <input type="radio" id="format-csv" name="export-format" value="csv" checked>
+        <label for="format-csv" id="csv-label">CSV - נתונים ללא עיצוב</label>
+      </div>
+    </div>
+    
+    <div class="setting-group">
+      <label for="language-select" id="language-label">שפה:</label>
+      <select id="language-select">
+        <option value="he">עברית (Hebrew)</option>
+        <option value="en">אנגלית (English)</option>
+        <option value="es">ספרדית (Español)</option>
+        <option value="fr">צרפתית (Français)</option>
+      </select>
+    </div>
+    
+    <button class="save-btn" id="save-settings">שמור הגדרות</button>
+    <div class="status" id="status-message"></div>
+    
+    <div class="footer">
+      <img src="./rabaz.jpg" class="logo" alt="IDF Rabbinate Logo">
+      <!-- <img src="https://scontent.ftlv18-1.fna.fbcdn.net/v/t39.30808-6/451450847_493350836416164_1443334783628210572_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=dFbAg9DwZVUQ7kNvwFqqP2J&_nc_oc=Adl90Mx225ay8K7vBF5sOv81zfmZiweXz8i62e8YCnGin8nkMffja1XQIO6KqbIz7UQ&_nc_zt=23&_nc_ht=scontent.ftlv18-1.fna&_nc_gid=rpbZnSFjiFQEtqQfFHjrgA&oh=00_AfKLw4P4jUxwfOFPMW4v-aVjEhWRLwir8TXWIbxxCRod7w&oe=6834F52D" class="logo" alt="IDF Rabbinate Logo"> -->
+      <span title="🔥⚡Arieli88⚡🔥" id="credit-text">פותח ע״י תחום ניהו"ג</span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html> 
