@@ -2853,7 +2853,7 @@ window.addEventListener('message', async (e) => {
     try {
       // Check for preferred format and language
       const preferredFormat = e.data.preferredFormat || 'auto';
-      const language = e.data.language || 'he';
+      const language = e.data.language || 'en';
       
       // Load translations first
       await loadTranslations();
@@ -3234,7 +3234,7 @@ window.addEventListener('message', async (e) => {
           // Enhanced date and time formatting
           let dateFormatted = "", timeFormatted = "";
           try {
-            const localeCode = language === 'en' ? 'en-US' : 'he-IL';
+            const localeCode = language === 'en' ? 'en-US' : language === 'es' ? 'es-ES' : language === 'fr' ? 'fr-FR' : language === 'pt' ? 'pt-BR' : language === 'ar' ? 'ar-SA' : 'he-IL';
             
             // Always use DD.MM.YYYY format regardless of locale
             const day = String(timestampData.validDate.getDate()).padStart(2, '0');
@@ -3599,12 +3599,32 @@ function getTranslation(key, language) {
       'fr': {
         'pollName': 'Nom du sondage',
         'pollCreatedDate': 'Date de création',
-        'pollCreatedTime': 'Heure de création', 
+        'pollCreatedTime': 'Heure de création',
         'total': 'Total',
         'name': 'Nom',
         'phone': 'Téléphone',
         'responseDate': 'Date de réponse',
         'responseTime': 'Heure de réponse'
+      },
+      'pt': {
+        'pollName': 'Nome da enquete',
+        'pollCreatedDate': 'Data de criação',
+        'pollCreatedTime': 'Hora de criação',
+        'total': 'Total',
+        'name': 'Nome',
+        'phone': 'Telefone',
+        'responseDate': 'Data da resposta',
+        'responseTime': 'Hora da resposta'
+      },
+      'ar': {
+        'pollName': 'اسم الاستطلاع',
+        'pollCreatedDate': 'تاريخ الإنشاء',
+        'pollCreatedTime': 'وقت الإنشاء',
+        'total': 'المجموع',
+        'name': 'الاسم',
+        'phone': 'الهاتف',
+        'responseDate': 'تاريخ الإجابة',
+        'responseTime': 'وقت الإجابة'
       }
     };
     
@@ -3626,7 +3646,9 @@ function exportToExcelViaHTML(pollOptions, voteAccumulator, voteRows, pollName, 
     // Format dates with proper locale
     const localeCode = language === 'en' ? 'en-US' : 
                       language === 'es' ? 'es-ES' : 
-                      language === 'fr' ? 'fr-FR' : 'he-IL';
+                      language === 'fr' ? 'fr-FR' :
+                      language === 'pt' ? 'pt-BR' :
+                      language === 'ar' ? 'ar-SA' : 'he-IL';
     
     // FIXED: Format poll creation date as DD.MM.YYYY
     const day = String(pollCreationDate.getDate()).padStart(2, '0');
@@ -3869,7 +3891,9 @@ function exportToCSV(pollOptions, voteAccumulator, voteRows, pollName, pollCreat
     // Set proper locale for date formatting
     const localeCode = language === 'en' ? 'en-US' : 
                       language === 'es' ? 'es-ES' : 
-                      language === 'fr' ? 'fr-FR' : 'he-IL';
+                      language === 'fr' ? 'fr-FR' :
+                      language === 'pt' ? 'pt-BR' :
+                      language === 'ar' ? 'ar-SA' : 'he-IL';
     
     // Create CSV content - updated structure to match Excel export
     let csv = "";
@@ -3982,7 +4006,9 @@ function exportToNativeXLSX(pollOptions, voteAccumulator, voteRows, pollName, po
     // Set proper locale for date formatting
     const localeCode = language === 'en' ? 'en-US' : 
                       language === 'es' ? 'es-ES' : 
-                      language === 'fr' ? 'fr-FR' : 'he-IL';
+                      language === 'fr' ? 'fr-FR' :
+                      language === 'pt' ? 'pt-BR' :
+                      language === 'ar' ? 'ar-SA' : 'he-IL';
     
     // Create workbook and worksheet - explicitly creating a new non-macro workbook
     const wb = window.XLSX.utils.book_new();
