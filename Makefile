@@ -1,4 +1,4 @@
-VERSION  := 2.0
+VERSION  := 0.1.0
 DIST     := dist
 
 # Files bundled into every package
@@ -12,15 +12,17 @@ SOURCES := \
 
 .PHONY: all chrome firefox edge clean help
 
-all: chrome firefox
+all: edge chrome firefox
 
 chrome: $(DIST)/chrome-v$(VERSION).zip
 
 firefox: $(DIST)/firefox-v$(VERSION).zip
 
-edge: chrome
+edge: $(DIST)/edge-v$(VERSION).zip
+
+$(DIST)/edge-v$(VERSION).zip: $(DIST)/chrome-v$(VERSION).zip
 	@cp $(DIST)/chrome-v$(VERSION).zip $(DIST)/edge-v$(VERSION).zip
-	@echo "Edge package (identical to Chrome): $(DIST)/edge-v$(VERSION).zip"
+	@echo "  Done: $(DIST)/edge-v$(VERSION).zip  ($$(du -sh $(DIST)/edge-v$(VERSION).zip | cut -f1))"
 
 $(DIST)/chrome-v$(VERSION).zip: manifest.json $(SOURCES)
 	@mkdir -p $(DIST)
@@ -53,7 +55,7 @@ help:
 	@echo "    all      Build Chrome and Firefox packages (default)"
 	@echo "    chrome   Build Chrome/Edge .zip"
 	@echo "    firefox  Build Firefox .zip"
-	@echo "    edge     Alias for chrome (same package)"
+	@echo "    edge     Build Edge .zip (copied from Chrome)"
 	@echo "    clean    Remove dist/"
 	@echo "    help     Show this message"
 	@echo ""
