@@ -1,0 +1,24 @@
+# Build artifacts
+dist/
+*.zip
+*.xpi
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (if ever added)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Temporary files
+*.tmp
+*.bak
