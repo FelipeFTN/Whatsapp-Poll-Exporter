@@ -125,6 +125,13 @@ async function initializeExtension() {
     try {
       await makeXLSXGlobal();
 
+      // Expose extension base URL to page context so moduleraid.js can load
+      // sub-scripts without calling chrome.runtime (unavailable in page world on Firefox)
+      const urlBridge = document.createElement('script');
+      urlBridge.textContent = `window.__WA_EXT_URL = ${JSON.stringify(browserAPI.runtime.getURL(''))};`;
+      (document.head || document.documentElement).appendChild(urlBridge);
+      urlBridge.remove();
+
       let loaded = false;
       for (let i = 0; i < 3; i++) {
         loaded = await injectScript(browserAPI.runtime.getURL('moduleraid.js'), 'body');
@@ -216,48 +223,16 @@ function createDownloadButton() {
   btn.className = DOWNLOAD_BTN_CLASS;
   btn.setAttribute('data-injected', 'true');
   btn.setAttribute('role', 'button');
-  btn.style.cssText = [
-    'color: #53bdeb',
-    'background: transparent',
-    'padding: 8px 12px',
-    'font-size: 14px',
-    'font-family: inherit',
-    'text-align: center',
-    'cursor: pointer',
-    'display: flex',
-    'align-items: center',
-    'justify-content: center',
-    'flex: 1',
-    'z-index: 1000',
-    'user-select: none',
-  ].join(';');
+  btn.setAttribute('tabindex', '0');
+  btn.style.cssText = 'color:#53bdeb;background:transparent;padding:8px 12px;font-size:15px;font-family:inherit;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:1;user-select:none;';
   return btn;
 }
 
 function injectButtonIntoContainer(container, pollElement) {
   if (container.querySelector(`.${DOWNLOAD_BTN_CLASS}`)) return false;
 
-  // Clone the first existing sibling button to inherit WhatsApp's styles
-  const sibling = container.querySelector('div[class*="x1nhvcw1"], div[class*="x1c4vz4f"]');
-  let btn;
-
-  if (sibling) {
-    btn = sibling.cloneNode(true);
-    btn.textContent = getButtonLabel(userSettings.language);
-    btn.className = `${sibling.className} ${DOWNLOAD_BTN_CLASS}`;
-  } else {
-    btn = createDownloadButton();
-  }
-
-  btn.classList.add(DOWNLOAD_BTN_CLASS);
-  btn.setAttribute('data-injected', 'true');
-  btn.style.zIndex = '1000';
-  btn.style.cursor = 'pointer';
-
-  container.style.display = 'flex';
-  container.style.justifyContent = 'space-evenly';
+  const btn = createDownloadButton();
   container.appendChild(btn);
-
   attachDownloadHandler(btn, pollElement);
   return true;
 }
@@ -265,13 +240,22 @@ function injectButtonIntoContainer(container, pollElement) {
 // ─── Poll detection helpers ───────────────────────────────────────────────────
 
 function findPollMessageContainer(element) {
+  // First pass: look for WhatsApp's per-message focusable-list-item that has a data-id.
+  // This is the most specific match and avoids chat-level data-id attributes.
   let el = element;
+  while (el && el !== document.body) {
+    if (el.classList?.contains('focusable-list-item') && el.hasAttribute('data-id')) {
+      return el;
+    }
+    el = el.parentElement;
+  }
+  // Second pass: any ancestor with data-id (catches WhatsApp DOM variations)
+  el = element;
   while (el && el !== document.body) {
     if (el.hasAttribute('data-id')) return el;
     el = el.parentElement;
   }
-  const inner = element.querySelector('[data-id]');
-  return inner || null;
+  return null;
 }
 
 function findParentWithClass(element, className) {
@@ -286,28 +270,18 @@ function findParentWithClass(element, className) {
 function tryInjectButton(container, viewVotesButton) {
   if (container.querySelector(`.${DOWNLOAD_BTN_CLASS}`)) return false;
 
-  // Find the flex container that holds the "View votes" button
-  let target = null;
-
-  if (viewVotesButton?.parentElement) {
-    const style = window.getComputedStyle(viewVotesButton.parentElement);
-    if (style.display === 'flex' || style.flexDirection) {
-      target = viewVotesButton.parentElement;
-    }
+  // The direct parent of the innermost "View votes" element is the button row.
+  // Walk up from it until we find a flex container — that's where we inject.
+  let target = viewVotesButton?.parentElement || null;
+  while (target && target !== document.body) {
+    const style = window.getComputedStyle(target);
+    if (style.display === 'flex') break;
+    target = target.parentElement;
   }
 
-  if (!target) {
-    const candidates = container.querySelectorAll('div[class*="x1c4vz4f"]');
-    for (const c of candidates) {
-      const hasViewVotes = Array.from(c.children).some(ch =>
-        ch.textContent?.trim() === 'View votes' ||
-        ch.textContent?.includes('View votes')
-      );
-      if (hasViewVotes) { target = c; break; }
-    }
-  }
+  if (!target || target === document.body) return false;
+  if (target.querySelector(`.${DOWNLOAD_BTN_CLASS}`)) return false;
 
-  if (!target) return false;
   return injectButtonIntoContainer(target, container);
 }
 
@@ -331,16 +305,14 @@ function setupPollButtonObserver() {
   }
 
   function scanForPolls() {
-    // Find all "View votes" elements not yet processed
+    // Find the innermost "View votes" elements only.
+    // Many ancestor divs share the same textContent — we only want the leaf.
     const candidates = Array.from(document.querySelectorAll('[role="button"], div')).filter((el) => {
       if (processedElements.has(el)) return false;
-      if (!el.textContent) return false;
-      // Match direct text "View votes" — skip elements that only have it via children
-      const directText = Array.from(el.childNodes)
-        .filter(n => n.nodeType === Node.TEXT_NODE)
-        .map(n => n.textContent.trim())
-        .join('');
-      return directText === 'View votes' || el.textContent.trim() === 'View votes';
+      if (el.textContent?.trim() !== 'View votes') return false;
+      // Skip if any direct child element also contains exactly "View votes" —
+      // that child is more specific and will be (or was) selected instead.
+      return !Array.from(el.children).some(ch => ch.textContent?.trim() === 'View votes');
     });
 
     candidates.forEach((el) => {

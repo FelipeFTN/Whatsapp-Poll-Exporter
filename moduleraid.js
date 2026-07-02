@@ -7,6 +7,16 @@
  * https://github.com/wwebjs/moduleRaid/blob/master/LICENSE
  */
 
+// Resolve an extension resource URL regardless of browser context.
+// moduleraid.js runs in page context where chrome.runtime is unavailable on Firefox.
+// script.js sets window.__WA_EXT_URL before injecting this file as a bridge.
+function extURL(filename) {
+  if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+    return chrome.runtime.getURL(filename);
+  }
+  return (window.__WA_EXT_URL || '') + filename;
+}
+
 // Load libphonenumber-js library for phone number formatting
 let libphonenumber = null;
 let libphonenumberReady = false;
@@ -15,7 +25,7 @@ let libphonenumberReady = false;
 function loadLibphonenumber() {
   try {
     const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('libphonenumber-js.min.js');
+    script.src = extURL('libphonenumber-js.min.js');
     script.id = 'libphonenumber-script';
     
     script.onload = () => {
@@ -3535,7 +3545,7 @@ async function loadTranslations() {
   try {
     // We need to load the translations file
     const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('translations.js');
+    script.src = extURL('translations.js');
     script.id = 'wa-translations-script';
     document.head.appendChild(script);
     
