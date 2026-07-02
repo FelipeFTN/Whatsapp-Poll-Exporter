@@ -163,6 +163,8 @@ function attachDownloadHandler(button, getPollContainer) {
     const pollElement = typeof getPollContainer === 'function' ? getPollContainer() : getPollContainer;
     const msgContainer = findPollMessageContainer(pollElement);
     const msgId = msgContainer?.getAttribute('data-id');
+    console.log('%c[PollExporter] DOM container element:', 'color:#25d366;font-weight:bold', msgContainer);
+    console.log('%c[PollExporter] data-id sent to Store lookup:', 'color:#25d366;font-weight:bold', msgId);
     if (!msgId) { console.error('[PollExporter] Could not find poll message ID'); return; }
 
     await loadUserSettings();

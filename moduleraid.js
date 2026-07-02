@@ -2929,68 +2929,62 @@ window.addEventListener('message', async (e) => {
       
       let votes = [];
       let poll = null;
-      
+
+      // ── ID DEBUG ─────────────────────────────────────────────────────────────
+      console.log('%c[PollExporter] Searching for export ID:', 'color:#25d366;font-weight:bold', e.data.export);
+      // ─────────────────────────────────────────────────────────────────────────
+
       // Get votes with error handling
       try {
         const voteModels = Store.PollVote.getModelsArray();
-        console.log("Vote models count:", voteModels.length);
-        
-        // Debug: Log structure of first vote model if available
-        if (voteModels.length > 0) {
-          const sampleVote = voteModels[0];
-          console.log("Sample vote model structure:", Object.keys(sampleVote));
-          // Log the properties with __x_ prefix
-          const xProps = Object.keys(sampleVote).filter(k => k.startsWith('__x_'));
-          console.log("Vote model __x_ properties:", xProps);
-        }
-        
+        console.log("[PollExporter] Total vote models:", voteModels.length);
+
+        // Log every unique parentMsgKey._serialized so we can see the format
+        const uniqueParentKeys = [...new Set(
+          voteModels
+            .map(x => x?.__x_parentMsgKey?._serialized)
+            .filter(Boolean)
+        )];
+        console.log('%c[PollExporter] Vote parentMsgKey._serialized values:', 'color:#53bdeb', uniqueParentKeys);
+
         votes = voteModels.filter(x => {
           try {
-            return x && x.__x_parentMsgKey && x.__x_parentMsgKey._serialized && 
+            return x && x.__x_parentMsgKey && x.__x_parentMsgKey._serialized &&
                   e.data.export.includes(x.__x_parentMsgKey._serialized);
           } catch (err) {
-            console.error("Error filtering vote model:", err);
             return false;
           }
         });
+        console.log("[PollExporter] Matched votes:", votes.length);
       } catch (err) {
-        console.error("Error getting vote models:", err);
+        console.error("[PollExporter] Error getting vote models:", err);
       }
-      
+
       // Get poll with error handling
       try {
         const msgModels = Store.Msg.getModelsArray();
-        console.log("Message models count:", msgModels.length);
-        
-        // Debug: Log structure of first poll message if available
         const pollMessages = msgModels.filter(m => m && m.type === "poll_creation");
-        console.log("Poll messages count:", pollMessages.length);
-        
-        if (pollMessages.length > 0) {
-          const samplePoll = pollMessages[0];
-          console.log("Sample poll structure:", Object.keys(samplePoll));
-          // Log the properties with __x_ prefix
-          const xProps = Object.keys(samplePoll).filter(k => k.startsWith('__x_'));
-          console.log("Poll __x_ properties:", xProps);
-        }
-        
-        poll = msgModels.filter(m => {
-          try {
-            return m && m.type === "poll_creation";
-          } catch (err) {
-            console.error("Error filtering message model:", err);
-            return false;
-          }
-        }).find(m => {
+        console.log("[PollExporter] Poll messages found:", pollMessages.length);
+
+        // Log every poll message __x_id so we can see the exact format
+        pollMessages.forEach((m, i) => {
+          console.log(`%c[PollExporter] Poll[${i}] __x_id:`, 'color:#53bdeb', {
+            id:          m.__x_id?.id,
+            _serialized: m.__x_id?._serialized,
+            remote:      m.__x_id?.remote?._serialized ?? m.__x_id?.remote,
+          });
+        });
+
+        poll = pollMessages.find(m => {
           try {
             return m && m.__x_id && m.__x_id.id && e.data.export.includes(m.__x_id.id);
           } catch (err) {
-            console.error("Error finding poll message:", err);
             return false;
           }
         });
+        console.log("[PollExporter] Matched poll:", poll ? poll.__x_id?.id : 'none');
       } catch (err) {
-        console.error("Error getting message models:", err);
+        console.error("[PollExporter] Error getting message models:", err);
       }
       
       // NEW: Extract poll creator information
