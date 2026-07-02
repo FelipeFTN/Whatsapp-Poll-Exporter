@@ -38,5 +38,11 @@
             ],
             "matches": ["https://web.whatsapp.com/*"]
         }
-    ]
+    ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "whatsapp-poll-exporter@felipeftn",
+            "strict_min_version": "109.0"
+        }
+    }
 }
