@@ -2,6 +2,8 @@
 
 A browser extension that adds an **Export** button next to every poll on WhatsApp Web, letting you download vote results as **Excel (XLSX)**, **Excel (HTML)**, or **CSV**.
 
+It's a fork of [Whatsapp-Poll-Export](https://github.com/arieli88/WhatsApp-Poll-Export)
+
 Works on Chrome, Edge, and Firefox.
 
 ---
