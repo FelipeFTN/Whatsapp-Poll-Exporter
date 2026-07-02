@@ -34,9 +34,9 @@ Works on Chrome, Edge, and Firefox.
 ### Firefox (unpacked)
 
 1. Clone or download this repository.
-2. Run `make firefox` to generate `dist/firefox-v2.0.zip` with the correct manifest.
+2. Run `make firefox` to generate `dist/firefox-v0.1.0.zip` with the correct manifest.
 3. Open `about:debugging#/runtime/this-firefox`.
-4. Click **Load Temporary Add-on** and select `dist/firefox-v2.0.zip` (or the `manifest.json` directly from the project folder — Firefox accepts both).
+4. Click **Load Temporary Add-on** and select `dist/firefox-v0.1.0.zip` (or the `manifest.json` directly from the project folder — Firefox accepts both).
 
 ---
 
@@ -59,8 +59,8 @@ make clean
 Output files:
 ```
 dist/
-  chrome-v2.0.zip   ← load in Chrome / Edge
-  firefox-v2.0.zip  ← load in Firefox
+  chrome-v0.1.0.zip   ← load in Chrome / Edge
+  firefox-v0.1.0.zip  ← load in Firefox
 ```
 
 ---

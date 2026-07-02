@@ -1,6 +1,8 @@
 VERSION  := 0.1.0
 DIST     := dist
 
+SRC := src/phone.js src/core.js src/exporter.js
+
 # Files bundled into every package
 SOURCES := \
 	popup.html popup.js \
@@ -10,9 +12,15 @@ SOURCES := \
 	icons/icon16.png icons/icon24.png icons/icon32.png \
 	icons/icon48.png icons/icon64.png icons/icon128.png
 
-.PHONY: all chrome firefox edge clean help
+.PHONY: all bundle chrome firefox edge clean help
 
-all: edge chrome firefox
+all: bundle edge chrome firefox
+
+bundle: moduleraid.js
+
+moduleraid.js: $(SRC)
+	@cat $(SRC) > moduleraid.js
+	@echo "  Bundled: moduleraid.js ($$(wc -l < moduleraid.js) lines)"
 
 chrome: $(DIST)/chrome-v$(VERSION).zip
 
@@ -24,7 +32,7 @@ $(DIST)/edge-v$(VERSION).zip: $(DIST)/chrome-v$(VERSION).zip
 	@cp $(DIST)/chrome-v$(VERSION).zip $(DIST)/edge-v$(VERSION).zip
 	@echo "  Done: $(DIST)/edge-v$(VERSION).zip  ($$(du -sh $(DIST)/edge-v$(VERSION).zip | cut -f1))"
 
-$(DIST)/chrome-v$(VERSION).zip: manifest.json $(SOURCES)
+$(DIST)/chrome-v$(VERSION).zip: manifest.json moduleraid.js $(SOURCES)
 	@mkdir -p $(DIST)
 	@echo "→ Building Chrome/Edge extension..."
 	@zip -qr $@ manifest.json $(SOURCES)
@@ -52,7 +60,8 @@ help:
 	@echo "  Usage: make [target]"
 	@echo ""
 	@echo "  Targets:"
-	@echo "    all      Build Chrome and Firefox packages (default)"
+	@echo "    all      Bundle src + build all packages (default)"
+	@echo "    bundle   Regenerate moduleraid.js from src/"
 	@echo "    chrome   Build Chrome/Edge .zip"
 	@echo "    firefox  Build Firefox .zip"
 	@echo "    edge     Build Edge .zip (copied from Chrome)"
